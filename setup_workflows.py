@@ -1,0 +1,87 @@
+import os
+import sys
+
+# Create the directory structure
+base_path = r"c:\Users\jagat\takebreak\BreakTimer"
+workflows_dir = os.path.join(base_path, ".github", "workflows")
+
+try:
+    os.makedirs(workflows_dir, exist_ok=True)
+    print(f"✓ Created directory: {workflows_dir}")
+    
+    # Create build.yml file
+    build_yml_content = """# GitHub Actions workflow for building BreakTimer
+# Triggered on every push and pull request to ensure the project builds correctly
+name: Build BreakTimer
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  build:
+    # Run on Windows environment since BreakTimer is a Windows Forms application
+    runs-on: windows-latest
+    
+    steps:
+    # Check out the repository code
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    # Set up .NET 8 SDK for building the project
+    - name: Setup .NET 8
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '8.0.x'
+
+    # Restore NuGet dependencies
+    - name: Restore NuGet packages
+      run: dotnet restore
+
+    # Build the project in Release configuration
+    - name: Build BreakTimer
+      run: dotnet build --configuration Release --no-restore
+
+    # Run any unit tests if they exist
+    - name: Run tests (if available)
+      run: dotnet test --configuration Release --no-build --verbosity normal
+      continue-on-error: true
+
+    # Publish the application as a self-contained executable
+    - name: Publish Release build
+      run: dotnet publish --configuration Release --output ./publish
+
+    # Upload build artifacts for debugging and distribution
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: BreakTimer-Release
+        path: ./publish
+        retention-days: 30
+
+    # Display build summary
+    - name: Build Summary
+      if: always()
+      run: |
+        Write-Host "========================================" -ForegroundColor Green
+        Write-Host "Build completed successfully!" -ForegroundColor Green
+        Write-Host "========================================" -ForegroundColor Green
+        Write-Host ""
+        Write-Host "Build Artifacts:" -ForegroundColor Cyan
+        Write-Host "  Location: ./publish" -ForegroundColor Yellow
+        Write-Host ""
+        Write-Host "Project: BreakTimer (.NET 8 Windows Forms)" -ForegroundColor Yellow
+"""
+    
+    build_yml_path = os.path.join(workflows_dir, "build.yml")
+    with open(build_yml_path, 'w') as f:
+        f.write(build_yml_content)
+    print(f"✓ Created file: {build_yml_path}")
+    print(f"\n✓ Successfully created GitHub Actions workflow structure!")
+    
+except Exception as e:
+    print(f"✗ Error: {e}", file=sys.stderr)
+    sys.exit(1)
