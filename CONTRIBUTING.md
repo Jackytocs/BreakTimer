@@ -5,6 +5,7 @@ Thank you for your interest in contributing to BreakTimer! This document provide
 ## Code of Conduct
 
 We are committed to providing a welcoming and inclusive environment. Please:
+
 - Be respectful to all contributors
 - Provide constructive feedback
 - Focus on the code, not the person
@@ -15,12 +16,14 @@ We are committed to providing a welcoming and inclusive environment. Please:
 ### Development Setup
 
 **Prerequisites:**
+
 - Windows 10/11 or WSL2 with Windows support
 - .NET 8 SDK (or later)
 - Git
 - Visual Studio 2022 / VS Code (optional but recommended)
 
 **Steps:**
+
 ```bash
 git clone https://github.com/yourusername/BreakTimer.git
 cd BreakTimer
@@ -29,6 +32,7 @@ dotnet run
 ```
 
 ### Project Structure
+
 ```
 BreakTimer/
 ├── Program.cs           # Entry point, exception handling
@@ -83,6 +87,7 @@ When suggesting features:
 Follow these conventions:
 
 **C# Naming:**
+
 ```csharp
 public class MyClassName { }           // PascalCase for classes
 public void MyMethodName() { }          // PascalCase for methods
@@ -91,6 +96,7 @@ private const int MyConstant = 42;      // PascalCase for constants
 ```
 
 **Formatting:**
+
 ```csharp
 // Use 4 spaces for indentation
 if (condition)
@@ -111,6 +117,7 @@ public string MyMethod(int parameter)
 ```
 
 **Best Practices:**
+
 - Enable nullable reference types: `#nullable enable`
 - Use `using` statements for resource disposal
 - Use `async/await` for long operations, not `Thread.Sleep()`
@@ -133,6 +140,7 @@ Docs: Update README with new features
 Format: `[Type]: Brief description`
 
 Valid types:
+
 - `feat` - New feature
 - `fix` - Bug fix
 - `refactor` - Code restructuring
@@ -168,6 +176,7 @@ Before submitting:
    - Checklist verification
 
 **PR Checklist:**
+
 - [ ] Code follows style guidelines
 - [ ] Self-reviewed your own code
 - [ ] Added comments for complex logic
@@ -185,6 +194,7 @@ Before submitting:
 - `docs/*` - Documentation updates
 
 ### Branch Naming
+
 ```
 feature/add-system-lock-detection
 fix/timer-drift-on-suspend
@@ -211,13 +221,16 @@ Releases follow semantic versioning: `MAJOR.MINOR.PATCH`
 ## Documentation
 
 ### README Updates
+
 - Reflect new features/changes
 - Keep installation steps current
 - Update feature list
 - Add screenshots for UI changes
 
 ### Code Comments
+
 Only comment complex logic:
+
 - **Good**: Explains *why*, not what
 - **Bad**: States what the code does (already clear)
 
@@ -232,7 +245,9 @@ int x = 5;
 ```
 
 ### XML Documentation
+
 Add for public APIs:
+
 ```csharp
 /// <summary>
 /// Saves configuration atomically to prevent corruption on system failure.
@@ -282,6 +297,7 @@ By contributing, you agree that your contributions will be licensed under the sa
 4. Approval and merge
 
 ### Review Feedback
+
 - Be receptive to suggestions
 - Ask for clarification if needed
 - Update code based on feedback
@@ -296,6 +312,7 @@ By contributing, you agree that your contributions will be licensed under the sa
 ## Recognition
 
 Contributors will be recognized in:
+
 - README contributors section
 - Release notes for PR authors
 - GitHub contributors page

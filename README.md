@@ -1,10 +1,4 @@
-
 # BreakTimer
-
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![.NET 8.0](https://img.shields.io/badge/.NET-8.0-512BD4)](https://dotnet.microsoft.com/en-us/download/dotnet/8.0)
-[![Windows](https://img.shields.io/badge/Platform-Windows%2010%2B-0078D4)](https://www.microsoft.com/windows)
-[![Build Status](https://img.shields.io/badge/Build-Passing-brightgreen)](.github/workflows/build.yml)
 
 A lightweight Windows desktop utility designed to prompt regular breaks, reducing physical strain and eye fatigue during prolonged computer use.
 
@@ -21,6 +15,7 @@ Get started with BreakTimer in seconds:
 5. Enjoy automatic break reminders with fullscreen overlays
 
 **Key Features:**
+
 - Multi-monitor support with automatic dimming of all displays
 - Precision timing immune to system sleep and CPU load
 - Session statistics tracking work and break time
@@ -31,14 +26,14 @@ Get started with BreakTimer in seconds:
 
 ## Features
 
-- Customizable work and break intervals (1-180 minutes and 1-30 minutes)
-- Multi-monitor support with automatic display dimming
-- Precision timing that handles system sleep
-- Session statistics tracking
-- Dark and light themes
-- Sound notifications
-- Auto-start with Windows
-- Privacy-first: all data stored locally, no telemetry
+- **Customizable Intervals**: Adjust work durations (1 to 180 minutes) and break durations (1 to 30 minutes) to suit individual focus cycles.
+- **Multi-Monitor Dimming**: Spawns passive background overlays across all secondary displays during breaks to ensure complete eye rest and prevent workflow bypass.
+- **Precision Timing**: Utilizes absolute system clock offsets (`DateTime.Now` comparisons) to avoid countdown drift during high CPU load or operating system sleep.
+- **Atomic Persistence**: Settings and session history are written to temporary files and replaced atomically, preventing data corruption during unexpected system power-offs.
+- **Session Metrics**: Tracks active work hours, completed breaks, and weekly daily averages locally.
+- **Privacy First**: Zero cloud integration, telemetry, or remote tracking. All configuration and behavioral logs remain local.
+- **Modular and Extensible**: Decoupled core business logic allows easy modifications to styling, sound behaviors, or wellness messages.
+- **System Startup Option**: Configures automatic startup with Windows using safe execution path quoting.
 
 ---
 
@@ -130,13 +125,53 @@ The source is structured to facilitate customization:
 
 ## Technical Architecture
 
-Simple, clean design:
+The codebase enforces strict separation of concerns, keeping logical services distinct from GUI rendering routines:
 
-- Responsive UI with async/await (never blocks)
-- Safe data storage with atomic file writes
-- Event-based error handling
-- Secure registry path handling
-- Independent components for easy testing
+- **Non-Blocking UI UI Execution**: Eliminates thread sleep cycles. Delay transitions use asynchronous tasks to keep the operating system message loop fully responsive.
+- **Atomic File Replacement**: Writes updates to a `.tmp` file before replacing active files on the disk, preventing empty settings errors if the system loses power mid-save.
+- **Loose Coupling**: Components like `ConfigManager.cs` use event-driven communication to notify the GUI of initialization errors, allowing the storage classes to be unit tested outside of the Windows Forms environment.
+- **Unquoted Path Safeguards**: Application startup registrations are wrapped in double quotes in the system registry to prevent unquoted path execution hijack vulnerabilities.
+
+---
+
+## Production Quality & Engineering Practices
+
+This project demonstrates professional software engineering standards suitable for enterprise deployment:
+
+### Code Quality
+
+- Exception handling with global crash logging to prevent unhandled exceptions
+- Nullable reference types enabled throughout for compile-time safety
+- Proper resource cleanup with using statements and disposal patterns
+- Clear separation of concerns between UI and business logic
+
+### Reliability
+
+- Atomic file operations prevent data corruption during system crashes
+- DateTime-based timing ensures accuracy even during system sleep or high CPU load
+- Graceful error handling for permission issues and resource unavailability
+- Comprehensive validation of user input and configuration bounds
+
+### Architecture
+
+- Event-driven error handling decouples core logic from UI framework
+- Modular design allows components to be unit tested independently
+- Non-blocking async/await patterns keep UI responsive
+- Service-based architecture (ConfigManager, SoundManager, SessionStatistics)
+
+### Security
+
+- Local-only data storage with no cloud telemetry or tracking
+- Safe registry path handling with proper quoting to prevent hijacking
+- User AppData permissions protect configuration from other users
+- Zero external dependencies beyond .NET standard libraries
+
+### DevOps Ready
+
+- Configured for GitHub Actions CI/CD automation
+- Single-file release builds with no external dependencies
+- Professional git workflow with tagged releases
+- Comprehensive documentation for contributors
 
 ---
 
@@ -173,18 +208,20 @@ dotnet publish src/BreakTimer/BreakTimer.csproj -c Release -r win-x64 --self-con
 
 ```text
 BreakTimer/
-├── Program.cs             # Application entry point
-├── AppConfig.cs           # Settings model
-├── ConfigManager.cs       # Settings persistence
-├── SessionStatistics.cs   # Break tracking
-├── BreakMessages.cs       # Wellness tips
-├── SoundManager.cs        # Audio alerts
-├── SettingsForm.cs        # Main UI window
-├── BreakForm.cs           # Break overlay
-├── BreakTimer.csproj      # Project file
+├── src/
+│   ├── Program.cs             # Global crash handling and application initialization
+│   ├── AppConfig.cs           # Settings model and boundary validations
+│   ├── ConfigManager.cs       # Atomic settings loading and saving engine
+│   ├── SessionStatistics.cs   # Metrics engine for tracking daily habits
+│   ├── BreakMessages.cs       # Core content repository for physical wellness tips
+│   ├── SoundManager.cs        # Audio notification controller
+│   ├── SettingsForm.cs        # Main configuration interface and system tray manager
+│   ├── BreakForm.cs           # Fullscreen primary and secondary monitor dimming forms
+│   └── BreakTimer.csproj      # Build system configurations
 ├── .gitignore
 ├── LICENSE
-└── README.md
+├── README.md
+└── BreakTimer.sln
 ```
 
 ---
