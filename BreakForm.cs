@@ -120,7 +120,8 @@ namespace BreakTimer
                 Font = new Font("Segoe UI", 28, FontStyle.Italic),
                 AutoSize = true,
                 TextAlign = ContentAlignment.MiddleCenter,
-                MaximumSize = new Size(800, 200)
+                MaximumSize = new Size(800, 200),
+                BackColor = Color.Transparent
             };
 
             // Statistics Display Label
@@ -251,7 +252,10 @@ namespace BreakTimer
                     }
                 }
             }
-            catch { /* Prevent failure on display config changes */ }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Trace.WriteLine($"[BreakForm] Failed to dim secondary monitors: {ex}");
+            }
         }
 
         #endregion
@@ -340,6 +344,7 @@ namespace BreakTimer
                 // Reset fade animation for new message
                 fadeAlpha = 0f;
                 isFadingIn = true;
+                UpdateMotivationLabelFade();
             }
 
             // Update statistics
@@ -365,6 +370,8 @@ namespace BreakTimer
                     fadeAlpha = 1f;
                     isFadingIn = false;
                 }
+
+                UpdateMotivationLabelFade();
             }
         }
 
@@ -451,6 +458,19 @@ namespace BreakTimer
         {
             isClosing = true;
             this.Close();
+        }
+
+        /// <summary>
+        /// Applies the current fade alpha value to the motivational label.
+        /// </summary>
+        private void UpdateMotivationLabelFade()
+        {
+            if (motivationLabel == null)
+                return;
+
+            Color accentColor = ColorTranslator.FromHtml(config.AccentColor);
+            int alpha = Math.Max(0, Math.Min(255, (int)(fadeAlpha * 255)));
+            motivationLabel.ForeColor = Color.FromArgb(alpha, accentColor);
         }
 
         /// <summary>

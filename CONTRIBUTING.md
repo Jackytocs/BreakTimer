@@ -25,7 +25,7 @@ We are committed to providing a welcoming and inclusive environment. Please:
 **Steps:**
 
 ```bash
-git clone https://github.com/yourusername/BreakTimer.git
+git clone https://github.com/Jackytocs/BreakTimer.git
 cd BreakTimer
 dotnet build
 dotnet run

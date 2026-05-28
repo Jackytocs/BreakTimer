@@ -8,7 +8,8 @@ A lightweight Windows desktop utility designed to prompt regular breaks, reducin
 
 Get started with BreakTimer in seconds:
 
-1. Download the latest release from [GitHub Releases](https://github.com/yourusername/BreakTimer/releases)
+1. Download the latest release from [GitHub Releases](https://github.com/Jackytocs/BreakTimer/releases)
+   - If a published release is not available yet, you can build from source with `dotnet publish` or use the latest artifact from the repo's CI workflow.
 2. Run `BreakTimer.exe` (no installation required)
 3. Set your work and break durations
 4. Click Start and minimize the window to system tray
@@ -188,7 +189,7 @@ Run the following commands in your preferred terminal:
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/BreakTimer.git
+git clone https://github.com/Jackytocs/BreakTimer.git
 cd BreakTimer
 
 # Restore dependencies

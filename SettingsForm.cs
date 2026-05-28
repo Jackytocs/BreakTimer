@@ -31,6 +31,8 @@ namespace BreakTimer
         // High-precision timer (1 second interval) with DateTime tracking
         private System.Windows.Forms.Timer? preciseTimer;
         private DateTime? workEndTime;
+        private DateTime? lastWorkTickTime;
+        private bool autoRestartEnabled;
         private int breakMinutes;
 
         private NotifyIcon? trayIcon;
@@ -278,6 +280,8 @@ namespace BreakTimer
 
             // Set target ending time point (DateTime-based for precision)
             workEndTime = DateTime.Now.AddMinutes(workMinutes);
+            lastWorkTickTime = DateTime.Now;
+            autoRestartEnabled = true;
             preciseTimer.Start();
 
             trayIcon.ShowBalloonTip(3000, "Timer Started", $"Focus window active: {workMinutes} minutes.", ToolTipIcon.Info);
@@ -292,6 +296,8 @@ namespace BreakTimer
             {
                 preciseTimer.Stop();
                 workEndTime = null;
+                lastWorkTickTime = null;
+                autoRestartEnabled = false;
                 startButton.Enabled = true;
                 stopButton.Enabled = false;
                 trayIcon.Text = "Break Timer (Stopped)";
@@ -308,15 +314,20 @@ namespace BreakTimer
             if (!workEndTime.HasValue || trayIcon == null || preciseTimer == null)
                 return;
 
-            TimeSpan timeLeft = workEndTime.Value - DateTime.Now;
+            DateTime now = DateTime.Now;
+            TimeSpan timeLeft = workEndTime.Value - now;
 
-            // Log continuous work seconds
-            Program.ConfigManager.Statistics.UpdateWorkTime(1);
+            // Log continuous work seconds using elapsed wall-clock time to avoid drift from timer tick delays.
+            TimeSpan elapsed = lastWorkTickTime.HasValue ? now - lastWorkTickTime.Value : TimeSpan.FromSeconds(1);
+            int elapsedSeconds = Math.Max(1, (int)Math.Round(elapsed.TotalSeconds));
+            Program.ConfigManager.Statistics.UpdateWorkTime(elapsedSeconds);
+            lastWorkTickTime = lastWorkTickTime.HasValue ? lastWorkTickTime.Value.AddSeconds(elapsedSeconds) : now;
 
             if (timeLeft <= TimeSpan.Zero)
             {
                 preciseTimer.Stop();
                 workEndTime = null;
+                lastWorkTickTime = null;
                 TriggerBreak();
             }
             else
@@ -338,9 +349,10 @@ namespace BreakTimer
             UpdateStatisticsDisplay();
 
             // Auto-restart work session cleanly if not manual stopped
-            if (startButton != null && !startButton.Enabled && workInput != null && preciseTimer != null)
+            if (autoRestartEnabled && workInput != null && preciseTimer != null)
             {
                 workEndTime = DateTime.Now.AddMinutes((double)workInput.Value);
+                lastWorkTickTime = DateTime.Now;
                 preciseTimer.Start();
             }
         }
